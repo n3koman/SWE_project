@@ -1,37 +1,38 @@
 from flask import Blueprint, request, jsonify
 from app import db
-from app.models import User
+from app.models import User, Farmer, Buyer, Role
 from werkzeug.security import generate_password_hash
 
 auth_bp = Blueprint('auth_bp', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    if request.method == 'GET':
-        return jsonify({"message": "Use POST method to register."})
-
     data = request.get_json()
-
-    if not data or not data.get('name') or not data.get('email') or not data.get('password'):
-        return jsonify({"error": "Missing data"}), 400
 
     name = data['name']
     email = data['email']
-    password = data['password']
+    password = generate_password_hash(data['password'])
+    role = data['role']
 
-    # Hash the password for security
-    hashed_password = generate_password_hash(password)
+    # Register as a Farmer
+    if role == 'farmer':
+        farm_name = data.get('farm_name')
+        farm_location = data.get('farm_location')
+        farm_size = data.get('farm_size')
+        crop_types = data.get('crop_types').split(',') if 'crop_types' in data else []
 
-    # Check if the user already exists
-    existing_user = User.query.filter_by(email=email).first()
-    if existing_user:
-        return jsonify({"error": "User already exists"}), 409
+        new_user = Farmer(
+            name=name, email=email, password=password, role=Role.FARMER,
+            farm_name=farm_name, farm_location=farm_location, 
+            farm_size=farm_size, crop_types=crop_types
+        )
+    
+    # Register as a Buyer
+    elif role == 'buyer':
+        delivery_address = data.get('delivery_address', '')
+        new_user = Buyer(name=name, email=email, password=password, role=Role.BUYER, delivery_address=delivery_address)
 
-    # Create a new user instance
-    new_user = User(name=name, email=email, password=hashed_password, role='farmer')
-
-    # Add the new user to the database
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"message": "User created successfully"}), 201
+    return jsonify({'message': 'User registered successfully'}), 201
