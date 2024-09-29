@@ -14,7 +14,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _password = '';
 
   Future<void> _registerUser() async {
-    var url = Uri.parse('https://swe-project-iota.vercel.app/register');  // Update with your backend URL
+    var url = Uri.parse('https://swe-project-liard.vercel.app/register');  // Update with your backend URL
     var response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
