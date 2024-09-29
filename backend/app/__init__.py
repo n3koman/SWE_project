@@ -12,10 +12,6 @@ def create_app():
     db.init_app(app)
     Migrate(app, db)
 
-    from app import models  # Import models to register them with Flask-Migrate
-
-    # Import and register the auth blueprint
-    from app.routes.auth_routes import auth_bp
-    app.register_blueprint(auth_bp)
+    from app import models  # Import all models to register with Flask-Migrate
 
     return app
