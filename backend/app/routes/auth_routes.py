@@ -3,7 +3,7 @@ from app import db
 from app.models import User, Farmer, Buyer, Role
 from werkzeug.security import generate_password_hash
 
-auth_bp = Blueprint('auth_bp', __name__)
+auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -36,3 +36,16 @@ def register():
     db.session.commit()
 
     return jsonify({'message': 'User registered successfully'}), 201
+
+@auth_bp.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+
+    # Authenticate user
+    user = User.query.filter_by(email=email).first()
+    if user and check_password_hash(user.password, password):
+        return jsonify({"message": "Login successful"}), 200
+    else:
+        return jsonify({"message": "Invalid credentials"}), 401
