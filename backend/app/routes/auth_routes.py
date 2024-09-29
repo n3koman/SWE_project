@@ -7,6 +7,9 @@ auth_bp = Blueprint('auth_bp', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
+    if request.method == 'GET':
+        return jsonify({"message": "Use POST method to register."})
+
     data = request.get_json()
 
     if not data or not data.get('name') or not data.get('email') or not data.get('password'):

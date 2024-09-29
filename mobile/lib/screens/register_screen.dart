@@ -14,25 +14,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _password = '';
 
   Future<void> _registerUser() async {
-    var url = Uri.parse('https://swe-project-liard.vercel.app/register');  // Update with your backend URL
-    var response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'name': _name,
-        'email': _email,
-        'password': _password,
-      }),
-    );
+  var url = Uri.parse('https://swe-project-liard.vercel.app/register');  // Update with your backend URL
+  var response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode({
+      'name': _name,
+      'email': _email,
+      'password': _password,
+    }),
+  );
 
-    if (response.statusCode == 201) {
-      // Registration successful
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration successful')));
-    } else {
-      // Registration failed
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration failed')));
-    }
+  if (response.statusCode == 201) {
+    // Registration successful
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration successful')));
+  } else {
+    // Registration failed
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration failed')));
   }
+}
 
   @override
   Widget build(BuildContext context) {
