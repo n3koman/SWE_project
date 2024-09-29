@@ -1,48 +1,18 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from app import create_app, db
 from flask_migrate import Migrate
-from flask_restx import Api, Resource, fields  # Import Flask-RESTX components
-from config import Config
+from sqlalchemy import text
 
-app = Flask(__name__)
-app.config.from_object(Config)
-
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
-api = Api(app, version='1.0', title='My API',
-          description='A simple API with Swagger UI documentation.')
-
-# Example of defining a model for Swagger docs
-user_model = api.model('User', {
-    'id': fields.Integer(readOnly=True, description='The unique identifier of a user'),
-    'name': fields.String(required=True, description='The name of the user'),
-    'email': fields.String(required=True, description='The email of the user'),
-})
-
-@api.route('/users')
-class UserList(Resource):
-    @api.doc('list_users')
-    def get(self):
-        """List all users"""
-        return [{'id': 1, 'name': 'John Doe', 'email': 'john@example.com'}]
-
-    @api.doc('create_user')
-    @api.expect(user_model)
-    def post(self):
-        """Create a new user"""
-        return {'result': 'User created'}, 201
-
-@api.route('/users/<int:id>')
-class User(Resource):
-    @api.doc('get_user')
-    def get(self, id):
-        """Fetch a user given its identifier"""
-        return {'id': id, 'name': 'John Doe', 'email': 'john@example.com'}
+app = create_app()  # Use the create_app function to create the Flask app
+migrate = Migrate(app, db)  # Initialize Flask-Migrate
 
 @app.route('/')
 def test_db():
-    return "Welcome to the API"
+    try:
+        with db.engine.connect() as connection:
+            result = connection.execute(text("SELECT 1"))
+            return f"Database Connected: {result.fetchone()[0]}"
+    except Exception as e:
+        return f"Error: {e}"
 
 if __name__ == '__main__':
     app.run(debug=True)
